@@ -35,10 +35,10 @@ def export_chained_collections(butler, chains, src_dir, dest_dir,
                 for ref_iter in butler.registry.queryDatasets(
                         '*', collections=collection).byParentDatasetType():
                     refs = refs.union(set(_ for _ in ref_iter))
+                exporter.saveCollection(collection)
             print(len(refs), flush=True)
             exporter.saveDatasets(refs)
-            exporter.saveCollection(collection)
-        exporter.saveCollection(chained_collection)
+            exporter.saveCollection(chained_collection)
 
 
 if __name__ == '__main__':
