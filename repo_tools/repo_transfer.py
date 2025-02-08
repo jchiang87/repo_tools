@@ -7,7 +7,7 @@ __all__ = ['export_chained_collections']
 
 def mc_cp(chained_collection, src, dest):
     """Use `mc cp --recursive` command line tool to copy from src to dest."""
-    command = (f"mc cp --recursive {src}/{chained_collection} "
+    command = (f"mc cp --recursive {src}/{chained_collection}/ "
                f"{dest}/{chained_collection}")
     subprocess.check_call(command, shell=True)
 
@@ -36,6 +36,7 @@ def export_chained_collections(butler, chains, src_dir, dest_dir,
                         '*', collections=collection).byParentDatasetType():
                     refs = refs.union(set(_ for _ in ref_iter))
             print(len(refs), flush=True)
+            exporter.saveDatasets(refs)
             exporter.saveCollection(collection)
         exporter.saveCollection(chained_collection)
 
