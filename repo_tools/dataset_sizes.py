@@ -23,7 +23,8 @@ def get_dstype_map(qg_file):
     return dict(dsmap)
 
 
-def get_dataset_sizes(butler, dsmap, limit=None, nsamp=None):
+def get_dataset_sizes(butler, dsmap, limit=None, nsamp=None,
+                      not_found_max=100):
     """
     Extract mean, median, and maximum dataset sizes from a repo.
     """
@@ -39,8 +40,17 @@ def get_dataset_sizes(butler, dsmap, limit=None, nsamp=None):
                 target_refs = refs
             else:
                 target_refs = np.random.choice(refs, replace=False, size=nsamp)
-            sizes = [os.path.getsize(butler.getURI(ref).path)
-                     for ref in target_refs]
+            sizes = []
+            files_not_found = 0
+            for ref in target_refs:
+                try:
+                    sizes.append(butler.getURI(ref).size())
+                except FileNotFoundError:
+                    files_not_found += 1
+                if files_not_found > not_found_max:
+                    break
+            if not sizes:
+                continue
             data['task'].append(task)
             data['dstype'].append(dstype)
             data['mean'].append(np.mean(sizes))
